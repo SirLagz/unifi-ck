@@ -1,0 +1,39 @@
+---
+version: "2.1"
+services:
+  unifi-network-application:
+    image: lscr.io/linuxserver/unifi-network-application:latest
+    container_name: unifi-network-application
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Indian/Christmas ## UPDATE FOR YOUR ENVIRONMENT
+      - MONGO_USER=unifi ## OPTIONAL NUPDATE FOR YOUR ENVIRONMENT
+      - MONGO_PASS=unifi ## OPTIONAL UPDATE FOR YOUR ENVIRONMENT
+      - MONGO_HOST=unifi-db
+      - MONGO_PORT=27017
+      - MONGO_DBNAME=unifi
+      - MEM_LIMIT=1024 #optional
+      - MEM_STARTUP=1024 #optional
+    volumes:
+      - /opt/unifi-ck:/config ## UPDATE FOR YOUR ENVIRONMENT
+    ports:
+      - 8443:8443
+      - 3478:3478/udp
+      - 10001:10001/udp
+      - 8081:8080
+      - 1900:1900/udp #optional
+      - 8843:8843 #optional
+      - 8880:8880 #optional
+      - 6789:6789 #optional
+      - 5514:5514/udp #optional
+    restart: unless-stopped
+  unifi-db:
+    image: docker.io/mongo:latest
+    container_name: unifi-db
+    ports:
+      - 27017:27017
+    volumes:
+      - /opt/mongo/data:/data/db ## UPDATE FOR YOUR ENVIRONMENT
+      - /opt/mongo/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro ## UPDATE FOR YOUR ENVIRONMENT, FILE MUST EXIST BEFORE STARTING STACK
+    restart: unless-stopped
